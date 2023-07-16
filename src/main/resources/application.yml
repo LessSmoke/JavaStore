@@ -1,0 +1,22 @@
+#?????
+
+#??????????: 1.url ?????jdbc: + {?????} + :// + {localhost????ip}?{??}/ + ????? +?+??
+#                  2.username
+#                  3.password
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/store?useUnicode=true&chararcterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  servlet:
+    multipart:
+      max-file-size: 10MB #设置springMVC最大上传文件大小
+      max-request-size: 15MB #设置最大请求大小
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.cy.store.entity
+
+#配置新增address业务里，每个用户可以申请的最大address条目数,在AddressServiceImpl中可以用@Value("${user.address.max-count}")来注入到属性中
+user:
+  address:
+    max-count: 20

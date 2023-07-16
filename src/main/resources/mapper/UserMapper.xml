@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace属性：用于指定当前映射文件和哪个接口进行映射，需要指定接口的文件路径，需要标注包的完整接口路径-->
+<mapper namespace="com.cy.store.mapper.UserMapper">
+    <!-- 自定义映射规则：resultMap来完成映射规则的定义
+                       id属性: 用于表示给映射规则分配一个唯一的ID值，对应的就是resultMap=“id的属性值”属性的取值
+                       type属性：取值是一个实体类，表示的是数据库中的查询结果与java中的哪个实体类进行结果集的映射-->
+    <resultMap id="UserEntityMap" type="com.cy.store.entity.User">
+        <!--将表的字段和累的属性不一致的字段进行指定匹配，名称不一致的字段可以不写
+            column属性：表中的字段名称
+            property属性：表示类中的属性名称
+            column和property配合完成名称不一致的映射
+            ******注意 在定义映射规则时主键是不可以省略的-->
+        <id column="uid" property="uid"></id>
+        <result column="is_delete" property="isDelete"></result>
+        <result column="created_user" property="createdUser"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="modified_user" property="modifiedUser"></result>
+        <result column="modified_time" property="modifiedUser"></result>
+    </resultMap>
+
+    <!--1. id属：表示映射接口种方法的名称，直接在标签的内容来编写SQL语句
+        2. useGenerateKeys属性：开启某个字段的值递增(通常设置为主键递增)
+        3. keyProperty属性：将表中的哪个字段作为主键递增
+        4. resultType：表示查询结果集类型，只需制定对应映射类的类型，并且包含完整的包接口
+               ***注意 resultType="com.cy.store.entity.User"必须要求表的字段和我映射实体类的属性命名是一致的
+        5. resultMap：表示当表的字段和类的对象属性的字段名称不一致时，来定义查询结果集的映射规则-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
+        INSERT INTO t_user (username,password,salt,phone,email,gender,avatar,
+                            is_delete,created_user,created_time,modified_user,modified_time)
+        VALUES (#{username},#{password},#{salt},#{phone},#{email},
+                #{gender},#{avatar},#{isDelete},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime})
+    </insert>
+    <!--select语句在执行的时候: 1.查询的是一个对象：需指定resultType属性
+                             2.查询的是多个对象-->
+    <select id="findByUsername" resultMap="UserEntityMap">
+        SELECT * FROM t_user WHERE username = #{username}
+    </select>
+
+    <select id="findByUid" resultMap="UserEntityMap">
+        SELECT * FROM t_user WHERE uid = #{uid}
+    </select>
+
+    <update id = "updatePasswordByUid">
+        UPDATE t_user SET password = #{password},
+                          modified_user = #{modifiedUser},
+                          modified_time = #{modifiedTime}
+        WHERE uid = #{uid}
+    </update>
+
+    <update id="updateInfoByUid">
+        UPDATE t_user
+        SET
+                <if test="phone!=null">phone=#{phone},</if>
+                <if test="email!=null">email=#{email},</if>
+                <if test="gender!=null">gender=#{gender},</if>
+                modified_user = #{modifiedUser},
+                modified_time = #{modifiedTime}
+        WHERE uid=#{uid}
+    </update>
+
+    <update id="updateAvatarByUid">
+        UPDATE t_user
+        SET
+            avatar = #{avatar},
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE uid=#{uid}
+    </update>
+</mapper>

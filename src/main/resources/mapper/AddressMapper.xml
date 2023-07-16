@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace属性：用于指定当前映射文件和哪个接口进行映射，需要指定接口的文件路径，需要标注包的完整接口路径-->
+<mapper namespace="com.cy.store.mapper.AddressMapper">
+    <!--定义实体类跟数据库表单映射规则-->
+    <resultMap id="AddressEntityMap" type="com.cy.store.entity.Address">
+        <id column="aid" property="aid"></id>
+        <result column="province_name" property="provinceName"></result>
+        <result column="province_code" property="provinceCode"></result>
+        <result column="city_name" property="cityName"></result>
+        <result column="city_code" property="cityCode"></result>
+        <result column="area_name" property="areaName"></result>
+        <result column="area_code" property="areaCode"></result>
+        <result column="is_default" property="isDefault"></result>
+        <result column="created_user" property="createdUser"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="modified_user" property="modifiedUser"></result>
+        <result column="modified_time" property="modifiedUser"></result>
+    </resultMap>
+
+    <insert id="insertAddress" keyProperty="aid" useGeneratedKeys="true">
+        INSERT INTO t_address (
+            uid, name, province_name, province_code, city_name, city_code, area_name, area_code, zip,
+            address, phone, tel,tag, is_default, created_user, created_time, modified_user, modified_time
+        ) VALUES (
+             #{uid}, #{name}, #{provinceName}, #{provinceCode}, #{cityName}, #{cityCode}, #{areaName},
+             #{areaCode}, #{zip}, #{address}, #{phone}, #{tel}, #{tag}, #{isDefault}, #{createdUser},
+             #{createdTime}, #{modifiedUser}, #{modifiedTime}
+                         )
+    </insert>
+
+    <!--标签resultTYpe属性: 将查询到的结果封装到某一个实体类中-->
+    <select id="countByUid" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_address WHERE uid=#{uid}
+    </select>
+
+    <select id="findByUid" resultMap="AddressEntityMap">
+        SELECT * FROM t_address WHERE uid = #{uid}
+        ORDER BY is_default DESC, created_time DESC
+    </select>
+
+    <select id="findByAid" resultMap="AddressEntityMap">
+        SELECT * FROM t_address WHERE aid = #{aid}
+    </select>
+
+    <update id="updateNonDefault">
+        UPDATE t_address
+        SET is_default = 0
+        WHERE uid = #{uid}
+    </update>
+
+    <update id="updateIsDefaultByAid">
+        UPDATE t_address
+        SET is_default = 1,modified_user = #{modifiedUser}, modified_time=#{modifiedTime}
+        WHERE aid = #{aid}
+    </update>
+
+    <delete id="deleteByAid">
+        DELETE FROM t_address WHERE aid = #{aid}
+    </delete>
+
+    <select id="findLastModified" resultMap="AddressEntityMap">
+        SELECT * FROM t_address
+        WHERE uid=#{uid}
+        ORDER BY modified_time DESC limit 0,1
+    </select>
+</mapper>
